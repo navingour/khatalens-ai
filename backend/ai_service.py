@@ -405,6 +405,296 @@ def get_genai_client():
 
 
 # =====================================================================
+# Indus Sarvam AI Service (https://indus.sarvam.ai / api.sarvam.ai)
+# =====================================================================
+
+def get_sarvam_api_key() -> Optional[str]:
+    """Retrieves Sarvam AI API subscription key from environment."""
+    key = os.getenv("SARVAM_API_KEY", "").strip()
+    return key if key else None
+
+
+def call_sarvam_chat(
+    prompt: str,
+    system_prompt: str = "You are KhataLens AI, an expert Indian GST compliance assistant for shopkeepers.",
+    model: str = "sarvam-105b-conversations",
+) -> Optional[str]:
+    """
+    Executes a chat completion call using Sarvam AI's sovereign Indian LLM (https://api.sarvam.ai).
+    Falls back between 'sarvam-105b-conversations' and 'sarvam-105b'.
+    """
+    api_key = get_sarvam_api_key()
+    if not api_key:
+        return None
+
+    import urllib.request
+    models_to_try = [model, "sarvam-105b-conversations", "sarvam-105b"]
+    seen_models = set()
+
+    for m in models_to_try:
+        if m in seen_models:
+            continue
+        seen_models.add(m)
+        payload = {
+            "model": m,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": prompt},
+            ],
+            "temperature": 0.1,
+        }
+        headers = {
+            "api-subscription-key": api_key,
+            "Content-Type": "application/json",
+        }
+        req = urllib.request.Request(
+            "https://api.sarvam.ai/v1/chat/completions",
+            data=json.dumps(payload).encode("utf-8"),
+            headers=headers,
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                choice = data.get("choices", [{}])[0]
+                msg = choice.get("message", {})
+                content = msg.get("content")
+                if content:
+                    return content
+        except Exception as e:
+            print(f"[Sarvam AI] Chat notice with model {m}: {e}")
+            continue
+
+    return None
+
+
+def call_sarvam_doc_parse(
+    file_bytes: bytes,
+    filename: str = "document.pdf",
+    output_format: str = "json",
+    max_wait_seconds: int = 15,
+) -> Optional[str]:
+    """
+    Submits a document/image to Sarvam AI Document Intelligence API (/doc-ai/v1/job/parse),
+    polls for job completion, and extracts layout-aware document text via Sarvam Vision.
+    """
+    api_key = get_sarvam_api_key()
+    if not api_key:
+        return None
+
+    import urllib.request
+    import uuid
+    import time
+
+    boundary = f"----WebKitFormBoundary{uuid.uuid4().hex}"
+    body = bytearray()
+    body.extend(f"--{boundary}\r\n".encode())
+    body.extend(f'Content-Disposition: form-data; name="file"; filename="{filename}"\r\n'.encode())
+
+    lower_fn = filename.lower()
+    if lower_fn.endswith(".png"):
+        mtype = "image/png"
+    elif lower_fn.endswith((".jpg", ".jpeg")):
+        mtype = "image/jpeg"
+    elif lower_fn.endswith(".pdf"):
+        mtype = "application/pdf"
+    else:
+        mtype = "application/octet-stream"
+
+    body.extend(f"Content-Type: {mtype}\r\n\r\n".encode())
+    body.extend(file_bytes)
+    body.extend(b"\r\n")
+
+    body.extend(f"--{boundary}\r\n".encode())
+    body.extend(b'Content-Disposition: form-data; name="output_format"\r\n\r\n')
+    body.extend(output_format.encode())
+    body.extend(b"\r\n")
+    body.extend(f"--{boundary}--\r\n".encode())
+
+    headers = {
+        "api-subscription-key": api_key,
+        "Content-Type": f"multipart/form-data; boundary={boundary}",
+    }
+
+    try:
+        req = urllib.request.Request(
+            "https://api.sarvam.ai/doc-ai/v1/job/parse",
+            data=bytes(body),
+            headers=headers,
+        )
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            init_res = json.loads(resp.read().decode("utf-8"))
+            job_id = init_res.get("job_id")
+            if not job_id:
+                return None
+
+        # Poll status
+        status_url = f"https://api.sarvam.ai/doc-ai/v1/job/{job_id}/status"
+        poll_headers = {"api-subscription-key": api_key}
+        start_time = time.time()
+
+        while time.time() - start_time < max_wait_seconds:
+            time.sleep(1.0)
+            try:
+                s_req = urllib.request.Request(status_url, headers=poll_headers)
+                with urllib.request.urlopen(s_req, timeout=10) as s_resp:
+                    status_res = json.loads(s_resp.read().decode("utf-8"))
+                    st = status_res.get("status")
+                    if st == "completed":
+                        res_url = f"https://api.sarvam.ai/doc-ai/v1/job/{job_id}/results?format=json"
+                        r_req = urllib.request.Request(res_url, headers=poll_headers)
+                        with urllib.request.urlopen(r_req, timeout=15) as r_resp:
+                            res_data = json.loads(r_resp.read().decode("utf-8"))
+                            lines = []
+                            for doc in res_data.get("documents", []):
+                                for page in doc.get("pages", []):
+                                    for block in page.get("blocks", []):
+                                        txt = block.get("text", "").strip()
+                                        if txt:
+                                            lines.append(txt)
+                            return "\n".join(lines).strip()
+                    elif st in ("failed", "rejected"):
+                        print(f"[Sarvam AI] Document parse job {job_id} status: {st}")
+                        return None
+            except Exception as poll_e:
+                print(f"[Sarvam AI] Polling note: {poll_e}")
+                continue
+
+    except Exception as e:
+        print(f"[Sarvam AI] Document parse error: {e}")
+        return None
+
+    return None
+
+
+def extract_bill_with_sarvam(
+    file_bytes: bytes,
+    mime_type: str,
+    shop_category: str = "",
+) -> Optional[Dict[str, Any]]:
+    """
+    Extracts bill details using Sarvam AI (Indus Sarvam AI):
+    1. Parses document/image layout using Sarvam Vision (/doc-ai/v1/job/parse).
+    2. Maps details to GST schema using sarvam-105b sovereign Indian LLM.
+    3. Grounded against verified CBIC HSN/SAC master data.
+    4. Validates Rule 46(b) invoice numbering.
+    """
+    from backend.tax_engine import validate_and_suggest_invoice_number
+
+    api_key = get_sarvam_api_key()
+    if not api_key:
+        return None
+
+    # Step 1: Extract document text
+    is_image = "image" in mime_type.lower() or mime_type.lower() in ("image/jpeg", "image/png", "image/webp")
+    doc_text = ""
+
+    if is_image or "pdf" in mime_type.lower():
+        if "pdf" in mime_type.lower():
+            is_scanned, selectable_text = inspect_pdf_text(file_bytes)
+            if not is_scanned and len(selectable_text.strip()) >= 80:
+                doc_text = selectable_text
+
+        if not doc_text:
+            ext = ".png" if "png" in mime_type.lower() else (".pdf" if "pdf" in mime_type.lower() else ".jpg")
+            doc_text = call_sarvam_doc_parse(file_bytes, filename=f"bill{ext}", output_format="json")
+
+    if not doc_text or len(doc_text.strip()) < 10:
+        return None
+
+    # Step 2: Build grounded prompt
+    hsn_list = get_hsn_master_data()
+    category_hsn = [
+        f"{h['code']}: {h['description']} ({h['gst_rate']}%)"
+        for h in hsn_list
+        if shop_category and h.get("category", "").lower() == shop_category.lower()
+    ][:12]
+    service_hsn = [
+        f"{h['code']}: {h['description']} ({h['gst_rate']}%)"
+        for h in hsn_list
+        if h.get("type") == "services" or h.get("category") == "Professional Services"
+    ][:10]
+    seen = set()
+    combined_hsn = []
+    for item in category_hsn + service_hsn:
+        if item not in seen:
+            seen.add(item)
+            combined_hsn.append(item)
+
+    prompt = f"""
+You are KhataLens AI, an expert Indian GST compliance assistant for shopkeepers.
+Analyze the following text extracted from an uploaded bill/invoice by Sarvam Vision.
+Extract the exact invoice values into a clean JSON object matching the schema below.
+
+Document Content:
+\"\"\"
+{doc_text}
+\"\"\"
+
+Shop Context: {shop_category or 'General Business'}
+Verified HSN/SAC Reference:
+{json.dumps(combined_hsn, indent=2)}
+
+Strict Extraction Rules:
+1. Extract exact invoice_number, invoice_date (DD-MM-YYYY), supplier_gstin, supplier_name, recipient_gstin, recipient_name, items, taxable_value, cgst, sgst, igst, and gst_rate.
+2. If the document is not an invoice (e.g. playing cards, scenery, random photo), set invoice_number to "NOT_FOUND", taxable_value to 0.0, items to [], and explain what is depicted in the "notes" field.
+3. If Place of Supply (POS) is not explicitly stated, infer it from the first 2 digits of the customer GSTIN or supplier GSTIN.
+4. Output STRICTLY a valid JSON object with keys:
+{{
+  "invoice_number": "string",
+  "invoice_date": "DD-MM-YYYY",
+  "supplier_gstin": "string or null",
+  "supplier_name": "string or null",
+  "recipient_gstin": "string or null",
+  "recipient_name": "string or null",
+  "place_of_supply": "2-digit code or null",
+  "taxable_value": 0.0,
+  "cgst": 0.0,
+  "sgst": 0.0,
+  "igst": 0.0,
+  "gst_rate": 18.0,
+  "items": [
+    {{
+      "item_description": "string",
+      "hsn_code": "string",
+      "quantity": 1.0,
+      "unit": "NOS",
+      "taxable_amount": 0.0,
+      "gst_rate": 18.0
+    }}
+  ],
+  "confidence_score": 0.95,
+  "notes": "string or null"
+}}
+"""
+
+    resp_text = call_sarvam_chat(prompt, model="sarvam-105b-conversations")
+    if not resp_text:
+        return None
+
+    raw_result = _safe_parse_json(resp_text)
+    if isinstance(raw_result, list):
+        raw_result = raw_result[0] if (raw_result and isinstance(raw_result[0], dict)) else {}
+    if not isinstance(raw_result, dict) or not raw_result:
+        return None
+
+    raw_inum = raw_result.get("invoice_number", "")
+    val_report = validate_and_suggest_invoice_number(raw_inum)
+    raw_result["invoice_number_valid"] = val_report["invoice_number_valid"]
+    raw_result["invoice_number_error"] = val_report["invoice_number_error"]
+    raw_result["suggested_invoice_number"] = val_report["suggested_invoice_number"]
+
+    raw_result["recipient_gstin"] = raw_result.get("recipient_gstin") or raw_result.get("customer_gstin") or ""
+    raw_result["recipient_name"] = raw_result.get("recipient_name") or raw_result.get("customer_name") or ""
+    raw_result["extraction_source"] = "sarvam_ai"
+    raw_result["extraction_warning"] = None
+    raw_result["credits_consumed"] = 1
+    raw_result["needs_ai_scan"] = False
+    raw_result["cached"] = False
+
+    return raw_result
+
+
+# =====================================================================
 # Pydantic Schemas for Structured AI Outputs
 # =====================================================================
 
@@ -502,8 +792,18 @@ def _call_gemini_multimodal_bill(
     mime_type: str,
     shop_category: str = "",
 ) -> Dict[str, Any]:
-    """Helper that invokes gemini-3.8-flash (with fallback to gemini-3.5-flash-lite)."""
+    """Helper that invokes Sarvam AI (or fallback to gemini-3.8-flash / gemini-3.5-flash-lite)."""
     from backend.tax_engine import validate_and_suggest_invoice_number
+
+    # 1. Primary: Sarvam AI Vision + LLM
+    provider = os.getenv("AI_PROVIDER", "sarvam").lower()
+    if provider == "sarvam" and get_sarvam_api_key():
+        try:
+            sarvam_res = extract_bill_with_sarvam(file_bytes, mime_type, shop_category)
+            if sarvam_res and not sarvam_res.get("extraction_warning"):
+                return sarvam_res
+        except Exception as e:
+            print(f"[Notice] Sarvam AI extraction attempt error: {e}, falling back to Gemini")
 
     client = get_genai_client()
     use_vertex = os.getenv("GOOGLE_GENAI_USE_VERTEXAI", "false").lower() in ("true", "1", "yes")
@@ -898,9 +1198,7 @@ def map_and_parse_tabular_data(
 
 
 def _map_columns_with_gemini(headers: List[str], sample_rows: List[Dict[str, Any]]) -> Dict[str, str]:
-    """Calls Gemini with only headers + 2 sample rows to map columns to standard schema."""
-    client = get_genai_client()
-
+    """Maps tabular columns to standard GST schema using Sarvam AI (or Gemini / heuristic fallback)."""
     # Heuristic fallback if no API key
     heuristic_map = {
         "invoice_number": next((h for h in headers if any(k in h.lower() for k in ["inv", "bill", "invoice", "doc"])), None),
@@ -914,6 +1212,41 @@ def _map_columns_with_gemini(headers: List[str], sample_rows: List[Dict[str, Any
         "taxable_amount": next((h for h in headers if any(k in h.lower() for k in ["taxable", "base", "amount", "value", "price"])), None),
         "gst_rate": next((h for h in headers if any(k in h.lower() for k in ["rate", "gst", "%", "slab"])), None),
     }
+
+    # 1. Primary: Sarvam AI
+    provider = os.getenv("AI_PROVIDER", "sarvam").lower()
+    if provider == "sarvam" and get_sarvam_api_key():
+        sarvam_prompt = f"""Given these table headers: {json.dumps(headers)}
+And these sample rows: {json.dumps(sample_rows, indent=2)}
+
+Match each standard field to the exact matching header from the table. If a field does not exist, leave it null.
+Respond STRICTLY with a valid JSON object matching this schema:
+{{
+  "invoice_number": "string or null",
+  "invoice_date": "string or null",
+  "recipient_gstin": "string or null",
+  "recipient_name": "string or null",
+  "place_of_supply": "string or null",
+  "item_description": "string or null",
+  "hsn_code": "string or null",
+  "quantity": "string or null",
+  "taxable_amount": "string or null",
+  "gst_rate": "string or null"
+}}
+"""
+        try:
+            resp_text = call_sarvam_chat(sarvam_prompt, model="sarvam-105b-conversations")
+            if resp_text:
+                mapped = _safe_parse_json(resp_text)
+                if isinstance(mapped, dict):
+                    for k, v in mapped.items():
+                        if v and v in headers:
+                            heuristic_map[k] = v
+                    return {k: v for k, v in heuristic_map.items() if v is not None}
+        except Exception as e:
+            print(f"[Warning] Column mapping with Sarvam failed: {e}. Falling back to Gemini/heuristics.")
+
+    client = get_genai_client()
 
     if not client:
         return {k: v for k, v in heuristic_map.items() if v is not None}
@@ -970,13 +1303,83 @@ def decode_gst_notice(
 ) -> Dict[str, Any]:
     """
     Decodes GST Scrutiny notices (ASMT-10 / DRC-01).
-    Primary model: gemini-4-hydrogen.
-    Safeguard: Fallback to gemini-3.8-flash on rate limits or errors.
+    Primary model: Sarvam AI (sarvam-105b-conversations) with Gemini / demo fallback.
     Output strictly in plain shopkeeper English:
     (1) What happened
     (2) Exact amount in ₹
     (3) Next action step checklist
     """
+    provider = os.getenv("AI_PROVIDER", "sarvam").lower()
+    if provider == "sarvam" and get_sarvam_api_key():
+        notice_text = ""
+        if mime_type.startswith("text/") or mime_type in ("application/json", ""):
+            try:
+                notice_text = file_bytes.decode("utf-8", errors="ignore")
+            except Exception:
+                notice_text = ""
+        elif mime_type == "application/pdf":
+            try:
+                _, notice_text = inspect_pdf_text(file_bytes)
+            except Exception:
+                notice_text = ""
+        if not notice_text or len(notice_text.strip()) < 40:
+            try:
+                parsed_doc = call_sarvam_doc_parse(file_bytes, mime_type)
+                if parsed_doc:
+                    notice_text = parsed_doc.get("text", "")
+            except Exception as e:
+                print(f"[Notice Gate] Sarvam doc parse error: {e}")
+
+        if notice_text and len(notice_text.strip()) >= 20:
+            prompt = f"""
+You are KhataLens AI, an expert Indian GST scrutiny notice defense specialist.
+Translate this official GST Notice ({notice_type_hint}) into plain, reassuring business English for a local shopkeeper.
+
+Notice Content:
+\"\"\"
+{notice_text[:12000]}
+\"\"\"
+
+Strict Communication Rules:
+1. NO legal or bureaucratic jargon. Explain in simple terms what the tax department flagged.
+2. State the EXACT total amount disputed in Indian Rupees (₹), breaking down Tax, Interest, and Penalty.
+3. Provide an actionable step-by-step checklist of what to do next (e.g. Reply in Form ASMT-11, reconcile ITC, or visit practitioner).
+4. Specify deadlines clearly.
+
+Respond STRICTLY with a valid JSON object matching this schema:
+{{
+  "notice_type": "{notice_type_hint}",
+  "notice_reference": "string",
+  "issuing_authority": "string",
+  "notice_date": "DD-MM-YYYY",
+  "tax_period": "string",
+  "what_happened": "string",
+  "total_amount_disputed": 0.0,
+  "tax_amount": 0.0,
+  "interest_amount": 0.0,
+  "penalty_amount": 0.0,
+  "action_steps": [
+    {{
+      "step_number": 1,
+      "action": "string",
+      "deadline": "string",
+      "form_to_file": "string"
+    }}
+  ],
+  "urgency_level": "High"
+}}
+"""
+            try:
+                resp_text = call_sarvam_chat(prompt, model="sarvam-105b-conversations")
+                if resp_text:
+                    parsed = _safe_parse_json(resp_text)
+                    if isinstance(parsed, list):
+                        parsed = parsed[0] if (parsed and isinstance(parsed[0], dict)) else {}
+                    if isinstance(parsed, dict) and parsed.get("what_happened"):
+                        return parsed
+            except Exception as e:
+                print(f"[Notice Gate] Sarvam notice decoding error: {e}, falling back to Gemini")
+
     client = get_genai_client()
 
     if not client:

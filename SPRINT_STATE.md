@@ -131,17 +131,16 @@
   - Public Test Deployment: Deployed global HTTPS Cloudflare tunnel proxy with Next.js API route rewrites, enabling live testing on mobile and external devices at `https://updating-factory-encoding-oaks.trycloudflare.com`.
 - [x] **Milestone 13 Completed:** Git Initialized & Committed (Clean Secrets Exclusion).
   - Configured bulletproof `.gitignore` strictly excluding all environment files (`.env`, `.env.local`, `.env.*`), private keys, service account credentials (`*AccountKey.json`, `buildathon-*.json`), virtual environments (`.venv`), and dependencies.
-  - Initialized git repository on branch `main`.
+  - Initialized git repository on branch `main` and pushed to remote `https://github.com/navingour/khatalens-ai`.
   - Committed MVP codebase cleanly under author `Nabin Gour <navingour@gmail.com>`.
-- [x] **Milestone 12 Completed:** Cloud Run Containerization & Automated Deployment Pipeline.
-  - Installed Google Cloud CLI (`gcloud 594.0.0`) in `/Users/nabin/.local/bin/gcloud`.
-  - Created `backend/Dockerfile` (Python 3.11-slim, dynamic `$PORT` handling for Cloud Run, bundled HSN master data).
-  - Created `backend/.dockerignore`.
-  - Created `frontend/Dockerfile` (Node 20-alpine multi-stage build leveraging Next.js standalone output).
-  - Created `frontend/.dockerignore`.
-  - Created automated deployment script `deploy-cloudrun.sh` enforcing `asia-south1` (Mumbai) residency for both backend and frontend services.
-  - Public Test Deployment: Deployed global HTTPS Cloudflare tunnel proxy with Next.js API route rewrites, enabling live testing on mobile and external devices at `https://updating-factory-encoding-oaks.trycloudflare.com`.
-- [x] **Milestone 13 Completed:** Git Initialized & Committed (Clean Secrets Exclusion).
-  - Configured bulletproof `.gitignore` strictly excluding all environment files (`.env`, `.env.local`, `.env.*`), private keys, service account credentials (`*AccountKey.json`, `buildathon-*.json`), virtual environments (`.venv`), and dependencies.
-  - Initialized git repository on branch `main`.
-  - Committed MVP codebase cleanly under author `Nabin Gour <navingour@gmail.com>`.
+- [x] **Milestone 14 Completed:** Indian Sovereign AI Integration via Sarvam AI (Indus Platform).
+  - `backend/.env` & `backend/.env.example`: Added `AI_PROVIDER=sarvam` and `SARVAM_API_KEY`.
+  - `backend/ai_service.py`:
+    - Integrated Sarvam Document AI API (`POST /doc-ai/v1/job/parse`) for high-fidelity Indian bill/invoice OCR and layout parsing.
+    - Integrated Sarvam 105B Reasoning (`sarvam-105b-conversations` via `POST /v1/chat/completions`) for structured JSON extraction with HSN/SAC grounding.
+    - Wired Sarvam AI into multimodal bill extraction (`_call_gemini_multimodal_bill`), tabular column mapping (`_map_columns_with_gemini`), and GST scrutiny notice decoding (`decode_gst_notice`) with graceful Gemini/heuristic fallback.
+    - Enforced zero hallucination: non-invoice imagery (playing cards, scenery) is accurately identified with `invoice_number = "NOT_FOUND"` and descriptive notes.
+  - `frontend/src/app/dashboard/page.tsx`:
+    - Updated credit attribution badges to render `🇮🇳 Sarvam AI (105B)` when `extraction_source === "sarvam_ai"`.
+    - Updated live credit meter and batch summary banners to reflect sovereign AI usage.
+  - Verification: Live integration tested across bill vision extraction and ASMT-10 notice scrutiny; Next.js production build (`next build`) compiled with 0 errors and 0 warnings.

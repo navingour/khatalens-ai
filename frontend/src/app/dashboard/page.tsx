@@ -617,7 +617,7 @@ function DashboardContent() {
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
             <span>
               {totalCreditsUsed > 0 ? (
-                <>Gemini: <strong className="text-teal-700">{totalCreditsUsed} credit{totalCreditsUsed > 1 ? "s" : ""}</strong></>
+                <>AI Used: <strong className="text-teal-700">{totalCreditsUsed} credit{totalCreditsUsed > 1 ? "s" : ""}</strong></>
               ) : (
                 <><strong>0 AI credits used</strong> <span className="text-emerald-700 font-semibold">(Python/Cache)</span></>
               )}
@@ -807,7 +807,7 @@ function DashboardContent() {
                     <span className="text-emerald-800 font-bold">{batchSummary.zeroCredit} via Python/Cache [0 Cr]</span>
                     {batchSummary.geminiCredit > 0 && (
                       <span className="text-teal-900 font-bold">
-                        , {batchSummary.geminiCredit} via Gemini Vision [{batchSummary.geminiCredit} Cr]
+                        , {batchSummary.geminiCredit} via AI/Vision [{batchSummary.geminiCredit} Cr]
                       </span>
                     )}
                     {batchSummary.skippedDuplicates > 0 && (
@@ -1111,6 +1111,8 @@ function DashboardContent() {
                                   ? "⏳ Pending Scan (0 Cr)"
                                   : inv.extraction_source === "api_key_missing"
                                   ? "Demo Fallback"
+                                  : inv.extraction_source === "sarvam_ai"
+                                  ? "🇮🇳 Sarvam AI (105B)"
                                   : "✨ Gemini Flash (1 Cr)"}
                               </span>
                             </div>
