@@ -42,10 +42,12 @@ ${GCLOUD_BIN} config set run/region "${REGION}"
 echo "Enabling Cloud Run & Cloud Build APIs..."
 ${GCLOUD_BIN} services enable run.googleapis.com cloudbuild.googleapis.com artifactregistry.googleapis.com --project "${PROJECT_ID}" || true
 
-# 5. Extract API key from backend/.env or environment variable
+# 5. Extract API keys from backend/.env or environment variable
+SARVAM_KEY="${SARVAM_API_KEY:-$(grep "^SARVAM_API_KEY=" backend/.env 2>/dev/null | cut -d '=' -f2- | tr -d '"' | tr -d "'" || true)}"
 GEMINI_KEY="${GEMINI_API_KEY:-$(grep "^GEMINI_API_KEY=" backend/.env 2>/dev/null | cut -d '=' -f2- | tr -d '"' | tr -d "'" || true)}"
-if [ -z "${GEMINI_KEY}" ]; then
-  echo "Error: GEMINI_API_KEY is not set in backend/.env or environment."
+
+if [ -z "${SARVAM_KEY}" ] && [ -z "${GEMINI_KEY}" ]; then
+  echo "Error: Neither SARVAM_API_KEY nor GEMINI_API_KEY is set in backend/.env or environment."
   exit 1
 fi
 
@@ -60,7 +62,7 @@ ${GCLOUD_BIN} run deploy khatalens-backend \
   --memory 1Gi \
   --cpu 1 \
   --timeout 300 \
-  --set-env-vars "GCP_PROJECT_ID=${PROJECT_ID},GCP_REGION=${REGION},ENVIRONMENT=production,GEMINI_API_KEY=${GEMINI_KEY},CRON_SECRET=khatalens-cron-secret-2026,ALLOW_DEV_AUTH=True" \
+  --set-env-vars "GCP_PROJECT_ID=${PROJECT_ID},GCP_REGION=${REGION},ENVIRONMENT=production,AI_PROVIDER=sarvam,SARVAM_API_KEY=${SARVAM_KEY},GEMINI_API_KEY=${GEMINI_KEY},CRON_SECRET=khatalens-cron-secret-2026,ALLOW_DEV_AUTH=True" \
   --project "${PROJECT_ID}"
 
 BACKEND_URL=$(${GCLOUD_BIN} run services describe khatalens-backend --region "${REGION}" --project "${PROJECT_ID}" --format='value(status.url)')
