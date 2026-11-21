@@ -1,0 +1,402 @@
+[
+  {
+    "code": "8481",
+    "digits": 4,
+    "description": "Taps, cocks, valves and similar appliances for pipes, boiler shells, tanks, vats or the like",
+    "category": "Hardware & Electricals",
+    "type": "goods",
+    "gst_rate": 18.0
+  },
+  {
+    "code": "848180",
+    "digits": 6,
+    "description": "Other appliances: Taps, cocks and valves for pipes",
+    "category": "Hardware & Electricals",
+    "type": "goods",
+    "gst_rate": 18.0
+  },
+  {
+    "code": "8536",
+    "digits": 4,
+    "description": "Electrical apparatus for switching or protecting electrical circuits (switches, relays, fuses, plugs, sockets) for <= 1000V",
+    "category": "Hardware & Electricals",
+    "type": "goods",
+    "gst_rate": 18.0
+  },
+  {
+    "code": "853650",
+    "digits": 6,
+    "description": "Other electrical switches for a voltage not exceeding 1000 V",
+    "category": "Hardware & Electricals",
+    "type": "goods",
+    "gst_rate": 18.0
+  },
+  {
+    "code": "8544",
+    "digits": 4,
+    "description": "Insulated wire, cable and other insulated electric conductors; optical fibre cables",
+    "category": "Hardware & Electricals",
+    "type": "goods",
+    "gst_rate": 18.0
+  },
+  {
+    "code": "854411",
+    "digits": 6,
+    "description": "Winding wire of copper for electrical equipment",
+    "category": "Hardware & Electricals",
+    "type": "goods",
+    "gst_rate": 18.0
+  },
+  {
+    "code": "7318",
+    "digits": 4,
+    "description": "Screws, bolts, nuts, coach screws, screw hooks, rivets, cotters, cotter-pins, washers of iron or steel",
+    "category": "Hardware & Electricals",
+    "type": "goods",
+    "gst_rate": 18.0
+  },
+  {
+    "code": "731815",
+    "digits": 6,
+    "description": "Other screws and bolts, whether or not with their nuts or washers",
+    "category": "Hardware & Electricals",
+    "type": "goods",
+    "gst_rate": 18.0
+  },
+  {
+    "code": "8504",
+    "digits": 4,
+    "description": "Electrical transformers, static converters (e.g. rectifiers) and inductors",
+    "category": "Hardware & Electricals",
+    "type": "goods",
+    "gst_rate": 18.0
+  },
+  {
+    "code": "9405",
+    "digits": 4,
+    "description": "Luminaires and lighting fittings including LED lamps and light fittings",
+    "category": "Hardware & Electricals",
+    "type": "goods",
+    "gst_rate": 18.0
+  },
+  {
+    "code": "8517",
+    "digits": 4,
+    "description": "Telephone sets, including smartphones and other telephones for cellular networks; other apparatus for transmission of voice or images",
+    "category": "Electronics & Mobile",
+    "type": "goods",
+    "gst_rate": 18.0
+  },
+  {
+    "code": "851713",
+    "digits": 6,
+    "description": "Smartphones for cellular networks",
+    "category": "Electronics & Mobile",
+    "type": "goods",
+    "gst_rate": 18.0
+  },
+  {
+    "code": "851779",
+    "digits": 6,
+    "description": "Other parts for telephone sets and cellular mobile networks",
+    "category": "Electronics & Mobile",
+    "type": "goods",
+    "gst_rate": 18.0
+  },
+  {
+    "code": "8471",
+    "digits": 4,
+    "description": "Automatic data processing machines (computers, laptops) and units thereof; magnetic or optical readers",
+    "category": "Electronics & Mobile",
+    "type": "goods",
+    "gst_rate": 18.0
+  },
+  {
+    "code": "847130",
+    "digits": 6,
+    "description": "Portable automatic data processing machines weighing not more than 10 kg (Laptops, Notebooks)",
+    "category": "Electronics & Mobile",
+    "type": "goods",
+    "gst_rate": 18.0
+  },
+  {
+    "code": "8528",
+    "digits": 4,
+    "description": "Monitors and projectors; reception apparatus for television (Smart TVs, LED monitors)",
+    "category": "Electronics & Mobile",
+    "type": "goods",
+    "gst_rate": 18.0
+  },
+  {
+    "code": "8507",
+    "digits": 4,
+    "description": "Electric accumulators, including separators therefor (Lithium-ion batteries, Inverter batteries)",
+    "category": "Electronics & Mobile",
+    "type": "goods",
+    "gst_rate": 18.0
+  },
+  {
+    "code": "850760",
+    "digits": 6,
+    "description": "Lithium-ion accumulators and mobile batteries",
+    "category": "Electronics & Mobile",
+    "type": "goods",
+    "gst_rate": 18.0
+  },
+  {
+    "code": "8541",
+    "digits": 4,
+    "description": "Semiconductor devices, photovoltaic cells assembled in modules or made up into panels (Solar Panels)",
+    "category": "Electronics & Mobile",
+    "type": "goods",
+    "gst_rate": 12.0
+  },
+  {
+    "code": "5208",
+    "digits": 4,
+    "description": "Woven fabrics of cotton, containing 85% or more by weight of cotton",
+    "category": "Textiles & Garments",
+    "type": "goods",
+    "gst_rate": 5.0
+  },
+  {
+    "code": "520811",
+    "digits": 6,
+    "description": "Unbleached plain weave cotton fabrics weighing not more than 100 g/m2",
+    "category": "Textiles & Garments",
+    "type": "goods",
+    "gst_rate": 5.0
+  },
+  {
+    "code": "6109",
+    "digits": 4,
+    "description": "T-shirts, singlets and other vests, knitted or crocheted",
+    "category": "Textiles & Garments",
+    "type": "goods",
+    "gst_rate": 5.0
+  },
+  {
+    "code": "610910",
+    "digits": 6,
+    "description": "T-shirts and vests of cotton, knitted or crocheted",
+    "category": "Textiles & Garments",
+    "type": "goods",
+    "gst_rate": 5.0
+  },
+  {
+    "code": "6203",
+    "digits": 4,
+    "description": "Men's or boys' suits, ensembles, jackets, blazers, trousers, bib and brace overalls",
+    "category": "Textiles & Garments",
+    "type": "goods",
+    "gst_rate": 12.0
+  },
+  {
+    "code": "6204",
+    "digits": 4,
+    "description": "Women's or girls' suits, ensembles, jackets, dresses, skirts, divided skirts, trousers",
+    "category": "Textiles & Garments",
+    "type": "goods",
+    "gst_rate": 12.0
+  },
+  {
+    "code": "5407",
+    "digits": 4,
+    "description": "Woven fabrics of synthetic filament yarn, including sarees and dress materials",
+    "category": "Textiles & Garments",
+    "type": "goods",
+    "gst_rate": 5.0
+  },
+  {
+    "code": "0402",
+    "digits": 4,
+    "description": "Milk and cream, concentrated or containing added sugar or other sweetening matter (Milk Powder)",
+    "category": "FMCG & Grocery",
+    "type": "goods",
+    "gst_rate": 5.0
+  },
+  {
+    "code": "0902",
+    "digits": 4,
+    "description": "Tea, whether or not flavoured (Assam, Darjeeling tea packed)",
+    "category": "FMCG & Grocery",
+    "type": "goods",
+    "gst_rate": 5.0
+  },
+  {
+    "code": "090240",
+    "digits": 6,
+    "description": "Other black tea (fermented) and other partly fermented tea",
+    "category": "FMCG & Grocery",
+    "type": "goods",
+    "gst_rate": 5.0
+  },
+  {
+    "code": "1512",
+    "digits": 4,
+    "description": "Sunflower-seed, safflower or cotton-seed oil and fractions thereof, edible cooking oils",
+    "category": "FMCG & Grocery",
+    "type": "goods",
+    "gst_rate": 5.0
+  },
+  {
+    "code": "1701",
+    "digits": 4,
+    "description": "Cane or beet sugar and chemically pure sucrose, in solid form",
+    "category": "FMCG & Grocery",
+    "type": "goods",
+    "gst_rate": 5.0
+  },
+  {
+    "code": "1905",
+    "digits": 4,
+    "description": "Bread, pastry, cakes, biscuits and other bakers' wares",
+    "category": "FMCG & Grocery",
+    "type": "goods",
+    "gst_rate": 18.0
+  },
+  {
+    "code": "190531",
+    "digits": 6,
+    "description": "Sweet biscuits, cookies, cream wafers",
+    "category": "FMCG & Grocery",
+    "type": "goods",
+    "gst_rate": 18.0
+  },
+  {
+    "code": "3401",
+    "digits": 4,
+    "description": "Soap; organic surface-active products and preparations for use as soap, bars, cakes",
+    "category": "FMCG & Grocery",
+    "type": "goods",
+    "gst_rate": 18.0
+  },
+  {
+    "code": "3305",
+    "digits": 4,
+    "description": "Preparations for use on the hair (Shampoos, Hair oils)",
+    "category": "FMCG & Grocery",
+    "type": "goods",
+    "gst_rate": 18.0
+  },
+  {
+    "code": "2106",
+    "digits": 4,
+    "description": "Food preparations not elsewhere specified (packaged snacks, namkeen, health supplements)",
+    "category": "FMCG & Grocery",
+    "type": "goods",
+    "gst_rate": 12.0
+  },
+  {
+    "code": "3004",
+    "digits": 4,
+    "description": "Medicaments consisting of mixed or unmixed products for therapeutic or prophylactic uses (Formulations, tablets, syrups)",
+    "category": "Pharma & Medical",
+    "type": "goods",
+    "gst_rate": 12.0
+  },
+  {
+    "code": "300410",
+    "digits": 6,
+    "description": "Medicaments containing penicillins or derivatives thereof, with a penicillanic acid structure, or streptomycins",
+    "category": "Pharma & Medical",
+    "type": "goods",
+    "gst_rate": 12.0
+  },
+  {
+    "code": "300490",
+    "digits": 6,
+    "description": "Other medicines and pharmaceutical formulations for human medical treatment",
+    "category": "Pharma & Medical",
+    "type": "goods",
+    "gst_rate": 12.0
+  },
+  {
+    "code": "9018",
+    "digits": 4,
+    "description": "Instruments and appliances used in medical, surgical, dental or veterinary sciences",
+    "category": "Pharma & Medical",
+    "type": "goods",
+    "gst_rate": 12.0
+  },
+  {
+    "code": "3005",
+    "digits": 4,
+    "description": "Wadding, gauze, bandages and similar articles impregnated or coated with pharmaceutical substances",
+    "category": "Pharma & Medical",
+    "type": "goods",
+    "gst_rate": 12.0
+  },
+  {
+    "code": "9983",
+    "digits": 4,
+    "description": "Other professional, technical and business services (Information technology, software development, consulting)",
+    "category": "Professional Services",
+    "type": "services",
+    "gst_rate": 18.0
+  },
+  {
+    "code": "998311",
+    "digits": 6,
+    "description": "Information technology (IT) consulting and support services",
+    "category": "Professional Services",
+    "type": "services",
+    "gst_rate": 18.0
+  },
+  {
+    "code": "9982",
+    "digits": 4,
+    "description": "Legal and accounting services (Tax consultancy, GST filing, auditing, bookkeeping)",
+    "category": "Professional Services",
+    "type": "services",
+    "gst_rate": 18.0
+  },
+  {
+    "code": "998222",
+    "digits": 6,
+    "description": "Accounting and tax compliance services for MSMEs and corporate entities",
+    "category": "Professional Services",
+    "type": "services",
+    "gst_rate": 18.0
+  },
+  {
+    "code": "9965",
+    "digits": 4,
+    "description": "Goods transport services (Goods Transport Agency / GTA, freight forwarding)",
+    "category": "Professional Services",
+    "type": "services",
+    "gst_rate": 5.0
+  },
+  {
+    "code": "9972",
+    "digits": 4,
+    "description": "Real estate services (Commercial property rental, leasing of industrial sheds)",
+    "category": "Professional Services",
+    "type": "services",
+    "gst_rate": 18.0
+  },
+  {
+    "code": "9985",
+    "digits": 4,
+    "description": "Support services (Employment, recruitment, personnel search, security)",
+    "category": "Professional Services",
+    "type": "services",
+    "gst_rate": 18.0
+  },
+  {
+    "code": "998513",
+    "digits": 6,
+    "description": "Placement and recruitment services of personnel",
+    "category": "Professional Services",
+    "type": "services",
+    "gst_rate": 18.0
+  },
+  {
+    "code": "998313",
+    "digits": 6,
+    "description": "Information technology (IT) systems consulting, implementation and support services",
+    "category": "Professional Services",
+    "type": "services",
+    "gst_rate": 18.0
+  }
+]

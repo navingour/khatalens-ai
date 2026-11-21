@@ -1,0 +1,59 @@
+# Secrets & Credentials
+backend/*AccountKey.json
+backend/serviceAccountKey.json
+backend/vertexAccountKey.json
+*AccountKey.json
+*firebase*.json
+*.pem
+*.key
+*.p12
+buildathon-*.json
+
+# Environment variables
+.env
+.env.*
+.env*.local
+backend/.env
+backend/.env.*
+frontend/.env.local
+frontend/.env.*
+!.env.example
+!backend/.env.example
+
+# JSON files whitelist (ignore all json except package & master data)
+*.json
+!package*.json
+!tsconfig.json
+!components.json
+!data/hsn_master.json
+!backend/data/hsn_master.json
+
+# Python
+backend/venv/
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node / Next.js
+frontend/node_modules/
+node_modules/
+frontend/.next/
+.next/
+out/
+build/
+dist/
+.vercel
+*.tsbuildinfo
+next-env.d.ts
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
