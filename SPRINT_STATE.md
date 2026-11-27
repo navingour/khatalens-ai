@@ -145,4 +145,4 @@
     - Updated live credit meter and batch summary banners to reflect sovereign AI usage.
   - Verification: Live integration tested across bill vision extraction and ASMT-10 notice scrutiny; Next.js production build (`next build`) compiled with 0 errors and 0 warnings.
   - End-to-End Test Suite: `backend/tests/test_e2e_app.py` executed successfully with 100% passing tests (HTTP 200 on landing page, dashboard, onboarding, CBIC regulatory news API, demo seeding, GSTR-1 JSON compilation, GSTR-2B ITC reconciliation, Section 47/50 late fee engine, and Sarvam AI notice decoder).
-  - Live Public Deployment: Tested and verified reachable over HTTPS at `https://academics-provider-still-resistance.trycloudflare.com`.
+  - Live Public Deployment: Tested and verified reachable over HTTPS at `https://footwear-spatial-jump-reduce.trycloudflare.com`.
